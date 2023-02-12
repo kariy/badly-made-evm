@@ -27,7 +27,7 @@ impl ExecutionContext {
         let return_data: Vec<u8> = Vec::new();
 
         while let Some(opcode) = program.get(self.pc.get()) {
-            let operation = Into::<OpCode>::into(*opcode);
+            let operation = OpCode::from(*opcode);
 
             match operation {
                 OpCode::STOP => return Ok(return_data),
@@ -79,7 +79,7 @@ impl ExecutionContext {
                         bail!("index out of bounds for program offset")
                     };
 
-                    match Into::<OpCode>::into(*opcode) {
+                    match OpCode::from(*opcode) {
                         OpCode::JUMPDEST => self.pc.set_exact(offset),
                         _ => bail!("jump destination must be the JUMPDEST opcode"),
                     }
