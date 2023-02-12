@@ -1,1 +1,3 @@
-pub struct GlobalEnvironment;
+use ethereum_types::H160;
+
+pub struct GlobalEnvironment {}

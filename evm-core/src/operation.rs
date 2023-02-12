@@ -16,6 +16,7 @@ pub enum OpCode {
     SWAP1,
     MLOAD,
     MSTORE,
+    LOG1,
 }
 
 impl From<u8> for OpCode {
@@ -38,6 +39,7 @@ impl From<u8> for OpCode {
             0x62 => Self::PUSH3,
             0x80 => Self::DUP1,
             0x90 => Self::SWAP1,
+            0xA1 => Self::LOG1,
             _ => panic!("unknown opcode"),
         }
     }
@@ -63,6 +65,7 @@ impl Into<&'static str> for OpCode {
             Self::SWAP1 => "SWAP1",
             Self::MLOAD => "MLOAD",
             Self::MSTORE => "MSTORE",
+            Self::LOG1 => "LOG1",
         }
     }
 }
