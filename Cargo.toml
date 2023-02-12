@@ -1,0 +1,7 @@
+[workspace]
+members = ["evm"]
+
+[package]
+name = "badly_made_evm"
+version = "0.1.0" 
+authors = ["Kariy <evergreenkary@gmail.com>"]
