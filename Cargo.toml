@@ -1,7 +1,12 @@
 [workspace]
 members = ["evm"]
 
-[package]
+[workspace.package]
 name = "badly_made_evm"
-version = "0.1.0" 
+version = "0.1.0"
+edition = "2021"
 authors = ["Kariy <evergreenkary@gmail.com>"]
+
+[workspace.dependencies]
+color-eyre = "0.6.2"
+ethereum-types = "0.14.1"
