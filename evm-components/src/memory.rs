@@ -1,6 +1,11 @@
-pub(crate) struct Memory(Vec<u8>);
+#[derive(Debug, Default)]
+pub struct Memory(Vec<u8>);
 
 impl Memory {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     // if it goes beyond its current size, writes 0s
     pub fn read_slice(&self, from: usize, to: usize) -> Vec<u8> {
         let size = self.0.len();
@@ -19,6 +24,11 @@ impl Memory {
             self.0.resize_with(to, || 0)
         }
         self.0.splice(offset..to, value);
+    }
+
+    /// Returns the amount of memory used in bytes
+    pub fn used_capacity(&self) -> usize {
+        self.0.len()
     }
 }
 
