@@ -115,6 +115,110 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
+                OpCode::LT | OpCode::SLT => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let result = if a < b { U256::one() } else { U256::zero() };
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::GT | OpCode::SGT => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let result = if a > b { U256::one() } else { U256::zero() };
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::EQ => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let result = if a == b { U256::one() } else { U256::zero() };
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::ISZERO => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let result = if a.is_zero() {
+                        U256::one()
+                    } else {
+                        U256::zero()
+                    };
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::AND => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let result = a & b;
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::OR => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let result = a | b;
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::XOR => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let result = a ^ b;
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::NOT => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let result = !a;
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::BYTE => {
+                    let i = self.execution_machine.stack.pop()?.as_usize();
+                    let x = self.execution_machine.stack.pop()?;
+
+                    let mut bytes = Vec::new();
+                    x.to_big_endian(&mut bytes);
+
+                    self.execution_machine.stack.push(U256::from(bytes[i]))?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                // SHR and SHL are inverted bcs U256 operates in little endian
+                OpCode::SHL => {
+                    let shift = self.execution_machine.stack.pop()?;
+                    let value = self.execution_machine.stack.pop()?;
+                    let result = value >> shift;
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::SHR => {
+                    let shift = self.execution_machine.stack.pop()?;
+                    let value = self.execution_machine.stack.pop()?;
+                    let result = value << shift;
+
+                    self.execution_machine.stack.push(result)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
                 OpCode::JUMP => {
                     let offset = self.execution_machine.stack.pop()?.as_usize();
 

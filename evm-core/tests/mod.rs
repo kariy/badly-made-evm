@@ -21,6 +21,30 @@ mod tests {
     }
 
     #[test]
+    fn comparison_operations() {
+        let program = vec![0x60, 0x01, 0x60, 0x20, 0x10, 0x15, 0x80, 0x14, 0x15, 0x15];
+        let mut context = ExecutionContext::new(Rc::new(GlobalEnvironment {}));
+
+        assert!(context.run(program).is_ok());
+        assert_eq!(U256::one(), context.execution_machine.stack.pop().unwrap());
+    }
+
+    #[test]
+    fn bitwise_operations() {
+        let program = vec![
+            0x60, 0x01, 0x60, 0x02, 0x16, 0x60, 0x01, 0x17, 0x60, 0x03, 0x1B, 0x60, 0x01, 0x17,
+            0x60, 0b1101, 0x18,
+        ];
+        let mut context = ExecutionContext::new(Rc::new(GlobalEnvironment {}));
+
+        assert!(context.run(program).is_ok());
+        assert_eq!(
+            U256::from(0b0100),
+            context.execution_machine.stack.pop().unwrap()
+        );
+    }
+
+    #[test]
     fn swap_operations() {
         let program = vec![0x60, 0x69, 0x60, 0x33, 0x90];
         let mut context = ExecutionContext::new(Rc::new(GlobalEnvironment {}));
