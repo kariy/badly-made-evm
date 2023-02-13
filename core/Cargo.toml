@@ -7,7 +7,7 @@ authors.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-evm-components = { path = "../evm-components" }
+evm-components = { path = "../components" }
 thiserror.workspace = true
 color-eyre.workspace = true
 ethereum-types.workspace = true
