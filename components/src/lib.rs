@@ -6,6 +6,7 @@ use memory::Memory;
 use program_counter::ProgramCounter;
 use stack::Stack;
 
+#[derive(Debug, Default)]
 pub struct ExecutionMachine {
     pub stack: Stack,
     pub memory: Memory,
@@ -15,9 +16,8 @@ pub struct ExecutionMachine {
 impl ExecutionMachine {
     pub fn new() -> Self {
         Self {
-            memory: Memory::new(),
-            pc: ProgramCounter::new(),
             stack: Stack::new(1024),
+            ..Default::default()
         }
     }
 }

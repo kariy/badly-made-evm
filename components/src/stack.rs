@@ -13,6 +13,7 @@ pub enum StackError {
 
 type Result<T> = std::result::Result<T, StackError>;
 
+#[derive(Debug, Default)]
 pub struct Stack {
     max_capacity: usize,
     inner: Vec<U256>,
@@ -32,7 +33,7 @@ impl Stack {
         let pos = self
             .inner
             .get_mut(index)
-            .ok_or_else(|| StackError::IndexOutOfBounds)?;
+            .ok_or(StackError::IndexOutOfBounds)?;
 
         *pos = value;
         Ok(value)
@@ -43,7 +44,7 @@ impl Stack {
         let index = (self.height() - 1) - offset;
         self.inner
             .get(index)
-            .ok_or_else(|| StackError::IndexOutOfBounds)
+            .ok_or(StackError::IndexOutOfBounds)
             .copied()
     }
 
@@ -57,7 +58,7 @@ impl Stack {
     }
 
     pub fn pop(&mut self) -> Result<U256> {
-        self.inner.pop().ok_or_else(|| StackError::StackUnderflow)
+        self.inner.pop().ok_or(StackError::StackUnderflow)
     }
 
     pub fn height(&self) -> usize {
