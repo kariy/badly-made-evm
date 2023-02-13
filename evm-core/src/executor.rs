@@ -66,7 +66,8 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
-                OpCode::DIV => {
+                // technically we wont be accepting non-hex values, so...
+                OpCode::DIV | OpCode::SDIV => {
                     let a = self.execution_machine.stack.pop()?;
                     let b = self.execution_machine.stack.pop()?;
                     let res = a.checked_div(b).unwrap_or(U256::zero());
@@ -74,10 +75,43 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
-                OpCode::MOD => {
+                // technically we wont be accepting non-hex values, so...
+                OpCode::MOD | OpCode::SMOD => {
                     let a = self.execution_machine.stack.pop()?;
                     let b = self.execution_machine.stack.pop()?;
                     self.execution_machine.stack.push(a % b)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::ADDMOD => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let n = self.execution_machine.stack.pop()?;
+
+                    let (c, _) = a.overflowing_add(b);
+                    let value = c % n;
+
+                    self.execution_machine.stack.push(value)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::MULMOD => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let b = self.execution_machine.stack.pop()?;
+                    let n = self.execution_machine.stack.pop()?;
+
+                    let (c, _) = a.overflowing_mul(b);
+                    let value = c % n;
+
+                    self.execution_machine.stack.push(value)?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::EXP => {
+                    let a = self.execution_machine.stack.pop()?;
+                    let exponent = self.execution_machine.stack.pop()?;
+                    let (value, _) = a.overflowing_pow(exponent);
+                    self.execution_machine.stack.push(value)?;
                     self.execution_machine.pc.increment_by(1);
                 }
 
