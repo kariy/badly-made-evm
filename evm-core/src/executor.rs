@@ -162,10 +162,7 @@ impl ExecutionContext {
 
                 OpCode::MLOAD => {
                     let offset = self.execution_machine.stack.pop()?.as_usize();
-                    let word = self
-                        .execution_machine
-                        .memory
-                        .read_slice(offset, offset + 32);
+                    let word = self.execution_machine.memory.read_bytes(offset, 32);
                     self.execution_machine
                         .stack
                         .push(U256::from_big_endian(&word))?;
@@ -181,13 +178,23 @@ impl ExecutionContext {
 
                     self.execution_machine
                         .memory
-                        .set(offset.as_usize(), value_be);
+                        .write_bytes(offset.as_usize(), value_be);
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::MSTORE8 => {
+                    let offset = self.execution_machine.stack.pop()?.as_usize();
+                    let value = self.execution_machine.stack.pop()?;
+                    let byte = value.byte(31);
+                    self.execution_machine
+                        .memory
+                        .write_bytes(offset, vec![byte]);
                     self.execution_machine.pc.increment_by(1);
                 }
 
                 OpCode::LOG1 => {
-                    let _offset = self.execution_machine.stack.pop()?.as_usize();
-                    let _size = self.execution_machine.stack.pop()?;
+                    let _ = self.execution_machine.stack.pop()?.as_usize();
+                    let _ = self.execution_machine.stack.pop()?;
                     let topic1 = self.execution_machine.stack.pop()?;
 
                     let log = vec![topic1];
