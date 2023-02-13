@@ -8,18 +8,18 @@ use evm_components::ExecutionMachine;
 
 #[derive(Debug, Default)]
 pub struct ExecutionEnvironment {
-    value: U256,
-    caller: H160,
-    gas_count: u128,
-    calldata: Vec<u8>,
-    contract_address: H160,
+    pub value: U256,
+    pub caller: H160,
+    pub calldata: Vec<u8>,
+    pub contract_address: H160,
+    // gas_count: u128,
 }
 
 pub struct ExecutionContext {
-    logs: Rc<RefCell<Vec<Vec<U256>>>>,
-    global_env: Rc<GlobalEnvironment>,
-    execution_env: ExecutionEnvironment,
-    execution_machine: ExecutionMachine,
+    pub logs: Rc<RefCell<Vec<Vec<U256>>>>,
+    pub global_env: Rc<GlobalEnvironment>,
+    pub execution_env: ExecutionEnvironment,
+    pub execution_machine: ExecutionMachine,
 }
 
 impl ExecutionContext {
