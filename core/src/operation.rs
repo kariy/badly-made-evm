@@ -5,7 +5,9 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum OperationError {
     #[error("unsupported operation {0}")]
-    Unsupported(OpCode),
+    Unsupported(u8),
+    #[error("expect PUSH operation followed by a value : {0}")]
+    PushValueExpected(OpCode),
 }
 
 #[derive(Debug)]
@@ -56,6 +58,8 @@ pub enum OpCode {
     LOG1,
     CALLVALUE,
     RETURN,
+
+    NOOP,
 }
 
 impl From<u8> for OpCode {
@@ -103,7 +107,8 @@ impl From<u8> for OpCode {
             // 0xA0 => Self::LOG0,
             0xA1 => Self::LOG1,
             0xF3 => Self::RETURN,
-            _ => panic!("unsupported operation"),
+
+            _ => Self::NOOP,
         }
     }
 }
@@ -156,6 +161,8 @@ impl fmt::Display for OpCode {
                 Self::LOG1 => "LOG1",
                 Self::CALLVALUE => "CALLVALUE",
                 Self::RETURN => "RETURN",
+
+                Self::NOOP => "NOOP",
             }
         )
     }

@@ -1,8 +1,11 @@
-use crate::{evm::GlobalEnvironment, operation::OpCode};
+use crate::{
+    evm::GlobalEnvironment,
+    operation::{OpCode, OperationError},
+};
 
 use std::{cell::RefCell, rc::Rc};
 
-use color_eyre::{eyre::bail, Result};
+use color_eyre::{eyre, eyre::bail, Result};
 use ethereum_types::{H160, U256};
 use evm_components::ExecutionMachine;
 
@@ -245,9 +248,10 @@ impl ExecutionContext {
                 }
 
                 OpCode::PUSH1 => {
-                    let Some(value) =  program.get(self.execution_machine.pc.get() + 1) else {
-                        bail!("expect PUSH operation followed by a number : PUSH1")
-                    };
+                    let value = program
+                        .get(self.execution_machine.pc.get() + 1)
+                        .ok_or(eyre::eyre!(OperationError::PushValueExpected(operation)))?;
+
                     self.execution_machine
                         .stack
                         .push(U256::from(*value))
@@ -358,6 +362,8 @@ impl ExecutionContext {
 
                     return Ok(return_value);
                 }
+
+                OpCode::NOOP => bail!(OperationError::Unsupported(*opcode)),
             }
         }
 
