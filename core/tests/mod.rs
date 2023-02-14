@@ -1,5 +1,6 @@
 #[cfg(test)]
 mod tests {
+
     use ethereum_types::U256;
     use evm_core::executor::ExecutionContext;
 
@@ -44,7 +45,9 @@ mod tests {
 
     #[test]
     fn swap_operations() {
-        let program = vec![0x60, 0x69, 0x60, 0x33, 0x90];
+        let program = vec![
+            0x60, 0x69, 0x60, 0x33, 0x90, 0x60, 0x77, 0x80, 0x82, 0x81, 0x84,
+        ];
         let mut context = ExecutionContext::default();
 
         assert!(context.run(program).is_ok());
@@ -54,7 +57,7 @@ mod tests {
         );
         assert_eq!(
             context.execution_machine.stack.get_from_top(1).unwrap(),
-            U256::from(0x33)
+            U256::from(0x77)
         );
     }
 

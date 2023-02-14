@@ -2,7 +2,7 @@
 
 > _Yes, the tables are stolen from [vEVM's README](https://github.com/kethcode/vEVM/blob/main/README.md) because I'm a lazy ass._
 
-No. of OPCODEs implemented : **38/141**
+No. of OPCODEs implemented : **108/141**
 
 ### 0x00 range - Stop and Arithmetic Operations
 
@@ -105,77 +105,77 @@ No. of OPCODEs implemented : **38/141**
 | PUSH1    | 0x60   | Done   |
 | PUSH2    | 0x61   | Done   |
 | PUSH3    | 0x62   | Done   |
-| PUSH4    | 0x63   |        |
-| PUSH5    | 0x64   |        |
-| PUSH6    | 0x65   |        |
-| PUSH7    | 0x66   |        |
-| PUSH8    | 0x67   |        |
-| PUSH9    | 0x68   |        |
-| PUSH10   | 0x69   |        |
-| PUSH11   | 0x6A   |        |
-| PUSH12   | 0x6B   |        |
-| PUSH13   | 0x6C   |        |
-| PUSH14   | 0x6D   |        |
-| PUSH15   | 0x6E   |        |
-| PUSH16   | 0x6F   |        |
-| PUSH17   | 0x70   |        |
-| PUSH18   | 0x71   |        |
-| PUSH19   | 0x72   |        |
-| PUSH20   | 0x73   |        |
-| PUSH21   | 0x74   |        |
-| PUSH22   | 0x75   |        |
-| PUSH23   | 0x76   |        |
-| PUSH24   | 0x77   |        |
-| PUSH25   | 0x78   |        |
-| PUSH26   | 0x79   |        |
-| PUSH27   | 0x7A   |        |
-| PUSH28   | 0x7B   |        |
-| PUSH29   | 0x7C   |        |
-| PUSH30   | 0x7D   |        |
-| PUSH31   | 0x7E   |        |
-| PUSH32   | 0x7F   |        |
+| PUSH4    | 0x63   | Done   |
+| PUSH5    | 0x64   | Done   |
+| PUSH6    | 0x65   | Done   |
+| PUSH7    | 0x66   | Done   |
+| PUSH8    | 0x67   | Done   |
+| PUSH9    | 0x68   | Done   |
+| PUSH10   | 0x69   | Done   |
+| PUSH11   | 0x6A   | Done   |
+| PUSH12   | 0x6B   | Done   |
+| PUSH13   | 0x6C   | Done   |
+| PUSH14   | 0x6D   | Done   |
+| PUSH15   | 0x6E   | Done   |
+| PUSH16   | 0x6F   | Done   |
+| PUSH17   | 0x70   | Done   |
+| PUSH18   | 0x71   | Done   |
+| PUSH19   | 0x72   | Done   |
+| PUSH20   | 0x73   | Done   |
+| PUSH21   | 0x74   | Done   |
+| PUSH22   | 0x75   | Done   |
+| PUSH23   | 0x76   | Done   |
+| PUSH24   | 0x77   | Done   |
+| PUSH25   | 0x78   | Done   |
+| PUSH26   | 0x79   | Done   |
+| PUSH27   | 0x7A   | Done   |
+| PUSH28   | 0x7B   | Done   |
+| PUSH29   | 0x7C   | Done   |
+| PUSH30   | 0x7D   | Done   |
+| PUSH31   | 0x7E   | Done   |
+| PUSH32   | 0x7F   | Done   |
 
 ### 0x80 range - Duplication Operations
 
 | Mnemonic | OpCode | Status |
 | -------- | ------ | ------ |
 | DUP1     | 0x80   | Done   |
-| DUP2     | 0x81   |        |
-| DUP3     | 0x82   |        |
-| DUP4     | 0x83   |        |
-| DUP5     | 0x84   |        |
-| DUP6     | 0x85   |        |
-| DUP7     | 0x86   |        |
-| DUP8     | 0x87   |        |
-| DUP9     | 0x88   |        |
-| DUP10    | 0x89   |        |
-| DUP11    | 0x8A   |        |
-| DUP12    | 0x8B   |        |
-| DUP13    | 0x8C   |        |
-| DUP14    | 0x8D   |        |
-| DUP15    | 0x8E   |        |
-| DUP16    | 0x8F   |        |
+| DUP2     | 0x81   | Done   |
+| DUP3     | 0x82   | Done   |
+| DUP4     | 0x83   | Done   |
+| DUP5     | 0x84   | Done   |
+| DUP6     | 0x85   | Done   |
+| DUP7     | 0x86   | Done   |
+| DUP8     | 0x87   | Done   |
+| DUP9     | 0x88   | Done   |
+| DUP10    | 0x89   | Done   |
+| DUP11    | 0x8A   | Done   |
+| DUP12    | 0x8B   | Done   |
+| DUP13    | 0x8C   | Done   |
+| DUP14    | 0x8D   | Done   |
+| DUP15    | 0x8E   | Done   |
+| DUP16    | 0x8F   | Done   |
 
 ### 0x90 range - Exchange Operations
 
 | Mnemonic | OpCode | Status |
 | -------- | ------ | ------ |
 | SWAP1    | 0x90   | Done   |
-| SWAP2    | 0x91   |        |
-| SWAP3    | 0x92   |        |
-| SWAP4    | 0x93   |        |
-| SWAP5    | 0x94   |        |
-| SWAP6    | 0x95   |        |
-| SWAP7    | 0x96   |        |
-| SWAP8    | 0x97   |        |
-| SWAP9    | 0x98   |        |
-| SWAP10   | 0x99   |        |
-| SWAP11   | 0x9A   |        |
-| SWAP12   | 0x9B   |        |
-| SWAP13   | 0x9C   |        |
-| SWAP14   | 0x9D   |        |
-| SWAP15   | 0x9E   |        |
-| SWAP16   | 0x9F   |        |
+| SWAP2    | 0x91   | Done   |
+| SWAP3    | 0x92   | Done   |
+| SWAP4    | 0x93   | Done   |
+| SWAP5    | 0x94   | Done   |
+| SWAP6    | 0x95   | Done   |
+| SWAP7    | 0x96   | Done   |
+| SWAP8    | 0x97   | Done   |
+| SWAP9    | 0x98   | Done   |
+| SWAP10   | 0x99   | Done   |
+| SWAP11   | 0x9A   | Done   |
+| SWAP12   | 0x9B   | Done   |
+| SWAP13   | 0x9C   | Done   |
+| SWAP14   | 0x9D   | Done   |
+| SWAP15   | 0x9E   | Done   |
+| SWAP16   | 0x9F   | Done   |
 
 ### 0xa0 range - logging ops
 

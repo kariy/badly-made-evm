@@ -1,6 +1,7 @@
 use crate::environment::GlobalEnvironment;
 use crate::operation::{OpCode, OperationError};
 use crate::utils::convert_u256_to_eth_address;
+use crate::{construct_dup_op, construct_push_op, construct_swap_op};
 
 use std::{cell::RefCell, rc::Rc};
 
@@ -346,60 +347,16 @@ impl ExecutionContext {
 
                 OpCode::JUMPDEST => self.execution_machine.pc.increment_by(1),
 
-                OpCode::PUSH1 => {
-                    let value = program
-                        .get(self.execution_machine.pc.get() + 1)
-                        .ok_or(eyre::eyre!(OperationError::PushValueExpected(operation)))?;
-
-                    self.execution_machine
-                        .stack
-                        .push(U256::from(*value))
-                        .unwrap();
-                    self.execution_machine.pc.increment_by(2);
-                }
-
-                OpCode::PUSH2 => {
-                    let start = self.execution_machine.pc.get() + 1;
-                    let end = start + 1;
-                    let value = &program[start..=end];
-
-                    self.execution_machine
-                        .stack
-                        .push(U256::from_big_endian(value))
-                        .unwrap();
-                    self.execution_machine.pc.increment_by(3);
-                }
-
-                OpCode::PUSH3 => {
-                    let start = self.execution_machine.pc.get() + 1;
-                    let end = start + 2;
-                    let value = &program[start..=end];
-
-                    self.execution_machine
-                        .stack
-                        .push(U256::from_big_endian(value))
-                        .unwrap();
-                    self.execution_machine.pc.increment_by(4);
-                }
+                OpCode::PUSH(amount) => construct_push_op!(amount, self, program),
 
                 OpCode::POP => {
                     self.execution_machine.stack.pop()?;
                     self.execution_machine.pc.increment_by(1);
                 }
 
-                OpCode::DUP1 => {
-                    let item = self.execution_machine.stack.get_from_top(0)?;
-                    self.execution_machine.stack.push(item)?;
-                    self.execution_machine.pc.increment_by(1);
-                }
+                OpCode::DUP(amount) => construct_dup_op!(amount, self),
 
-                OpCode::SWAP1 => {
-                    let a = self.execution_machine.stack.get_from_top(0)?;
-                    let b = self.execution_machine.stack.get_from_top(1)?;
-                    self.execution_machine.stack.set_from_top(0, b)?;
-                    self.execution_machine.stack.set_from_top(1, a)?;
-                    self.execution_machine.pc.increment_by(1);
-                }
+                OpCode::SWAP(amount) => construct_swap_op!(amount, self),
 
                 OpCode::MLOAD => {
                     let offset = self.execution_machine.stack.pop()?.as_usize();

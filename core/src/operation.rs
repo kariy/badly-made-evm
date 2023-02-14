@@ -62,13 +62,11 @@ pub enum OpCode {
     PC,
     MSIZE,
     // Push Operations
-    PUSH1,
-    PUSH2,
-    PUSH3,
+    PUSH(usize),
     // Duplication Operations
-    DUP1,
+    DUP(usize),
     // Exchange Operations
-    SWAP1,
+    SWAP(usize),
     // LOG0,
     LOG1,
     RETURN,
@@ -126,11 +124,12 @@ impl From<u8> for OpCode {
             0x59 => Self::MSIZE,
 
             0x5B => Self::JUMPDEST,
-            0x60 => Self::PUSH1,
-            0x61 => Self::PUSH2,
-            0x62 => Self::PUSH3,
-            0x80 => Self::DUP1,
-            0x90 => Self::SWAP1,
+
+            0x60..=0x7F => Self::PUSH((value - 0x5F) as usize),
+
+            0x80..=0x8F => Self::DUP((value - 0x7F) as usize),
+
+            0x90..=0x9F => Self::SWAP((value - 0x8F) as usize),
             // 0xA0 => Self::LOG0,
             0xA1 => Self::LOG1,
             0xF3 => Self::RETURN,
@@ -193,11 +192,11 @@ impl fmt::Display for OpCode {
                 Self::MSIZE => "MSIZE",
                 Self::JUMPDEST => "JUMPDEST",
 
-                Self::PUSH1 => "PUSH1",
-                Self::PUSH2 => "PUSH2",
-                Self::PUSH3 => "PUSH3",
-                Self::DUP1 => "DUP1",
-                Self::SWAP1 => "SWAP1",
+                Self::PUSH(amount) => Box::leak(Box::new(format!("PUSH{}", amount))),
+
+                Self::DUP(amount) => Box::leak(Box::new(format!("DUP{}", amount))),
+
+                Self::SWAP(amount) => Box::leak(Box::new(format!("SWAP{}", amount))),
                 // Self::LOG0 => "LOG0",
                 Self::LOG1 => "LOG1",
                 Self::CALLVALUE => "CALLVALUE",
@@ -207,4 +206,40 @@ impl fmt::Display for OpCode {
             }
         )
     }
+}
+
+#[macro_export]
+macro_rules! construct_push_op {
+    ($a:expr, $self:expr, $program:expr) => {{
+        let start = $self.execution_machine.pc.get() + 1;
+        let end = start + ($a - 1);
+        let value = &$program[start..=end];
+
+        $self
+            .execution_machine
+            .stack
+            .push(U256::from_big_endian(value))
+            .unwrap();
+        $self.execution_machine.pc.increment_by(1 + $a);
+    }};
+}
+
+#[macro_export]
+macro_rules! construct_dup_op {
+    ($a:expr, $self:expr) => {{
+        let item = $self.execution_machine.stack.get_from_top($a - 1)?;
+        $self.execution_machine.stack.push(item)?;
+        $self.execution_machine.pc.increment_by(1);
+    }};
+}
+
+#[macro_export]
+macro_rules! construct_swap_op {
+    ($a:expr, $self:expr) => {{
+        let a = $self.execution_machine.stack.get_from_top(0)?;
+        let b = $self.execution_machine.stack.get_from_top($a)?;
+        $self.execution_machine.stack.set_from_top(0, b)?;
+        $self.execution_machine.stack.set_from_top(1, a)?;
+        $self.execution_machine.pc.increment_by(1);
+    }};
 }
