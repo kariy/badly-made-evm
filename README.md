@@ -1,4 +1,4 @@
-## OPCODE COVERAGE
+### OPCODE COVERAGE
 
 > _Yes, the tables are stolen from [vEVM's README](https://github.com/kethcode/vEVM/blob/main/README.md) because I'm a lazy ass._
 
@@ -46,15 +46,15 @@ No. of OPCODEs implemented : **38/141**
 | -------- | ------ | ------ |
 | SHA3     | 0x20   |        |
 
-### 0x30 range - Environmental Information
+### 0x30 range - Environmental **Information**
 
 | Mnemonic       | OpCode | Status |
 | -------------- | ------ | ------ |
-| ADDRESS        | 0x30   |        |
-| BALANCE        | 0x31   |        |
+| ADDRESS        | 0x30   | Done   |
+| BALANCE        | 0x31   | Done   |
 | ORIGIN         | 0x32   |        |
-| CALLER         | 0x33   |        |
-| CALLVALUE      | 0x34   |        |
+| CALLER         | 0x33   | Done   |
+| CALLVALUE      | 0x34   | Done   |
 | CALLDATALOAD   | 0x35   |        |
 | CALLDATASIZE   | 0x36   |        |
 | CALLDATACOPY   | 0x37   |        |
@@ -75,15 +75,13 @@ No. of OPCODEs implemented : **38/141**
 | COINBASE    | 0x41   |        |
 | TIMESTAMP   | 0x42   |        |
 | NUMBER      | 0x43   |        |
-| DIFFICULTY  | 0x44   |        |
-| RANDOM      | 0x44   |        |
 | PREVRANDAO  | 0x44   |        |
 | GASLIMIT    | 0x45   |        |
 | CHAINID     | 0x46   |        |
-| SELFBALANCE | 0x47   |        |
+| SELFBALANCE | 0x47   | Done   |
 | BASEFEE     | 0x48   |        |
 
-### 0x50 range - 'storage' and execution
+### 0x50 range - Stack Memory Storage and Flow Operations
 
 | Mnemonic | OpCode | Status |
 | -------- | ------ | ------ |
@@ -94,9 +92,9 @@ No. of OPCODEs implemented : **38/141**
 | SLOAD    | 0x54   |        |
 | SSTORE   | 0x55   |        |
 | JUMP     | 0x56   | Done   |
-| JUMPI    | 0x57   |        |
+| JUMPI    | 0x57   | Done   |
 | PC       | 0x58   | Done   |
-| MSIZE    | 0x59   |        |
+| MSIZE    | 0x59   | Done   |
 | GAS      | 0x5A   |        |
 | JUMPDEST | 0x5B   | Done   |
 
@@ -208,5 +206,5 @@ No. of OPCODEs implemented : **38/141**
 | CREATE2      | 0xF5   |        |
 | STATICCALL   | 0xFA   |        |
 | REVERT       | 0xFD   |        |
-| INVALID      | 0xFE   |        |
+| INVALID      | 0xFE   | Done   |
 | SELFDESTRUCT | 0xFF   |        |

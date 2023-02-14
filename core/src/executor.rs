@@ -1,15 +1,15 @@
-use crate::{
-    evm::GlobalEnvironment,
-    operation::{OpCode, OperationError},
-};
+use crate::environment::GlobalEnvironment;
+use crate::operation::{OpCode, OperationError};
+use crate::utils::{compressed_u256_bytes, convert_u256_to_eth_address};
 
 use std::{cell::RefCell, rc::Rc};
 
 use color_eyre::{eyre, eyre::bail, Result};
 use ethereum_types::{H160, U256};
 use evm_components::ExecutionMachine;
+use sha3::{Digest, Sha3_256};
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct ExecutionEnvironment {
     pub value: U256,
     pub caller: H160,
@@ -18,7 +18,9 @@ pub struct ExecutionEnvironment {
     // gas_count: u128,
 }
 
+#[derive(Default)]
 pub struct ExecutionContext {
+    // TODO: change logs format
     pub logs: Rc<RefCell<Vec<Vec<U256>>>>,
     pub global_env: Rc<GlobalEnvironment>,
     pub execution_env: ExecutionEnvironment,
@@ -26,13 +28,12 @@ pub struct ExecutionContext {
 }
 
 impl ExecutionContext {
-    pub fn new(global_env: Rc<GlobalEnvironment>) -> Self {
+    pub fn new(execution_env: ExecutionEnvironment, global_env: Rc<GlobalEnvironment>) -> Self {
         Self {
             global_env,
+            execution_env,
             logs: Rc::new(RefCell::new(Vec::new())),
-            execution_machine: ExecutionMachine::new(),
-            // temporary
-            execution_env: ExecutionEnvironment::default(),
+            execution_machine: ExecutionMachine::default(),
         }
     }
 
@@ -222,6 +223,63 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
+                OpCode::SHA3 => {
+                    let offset = self.execution_machine.stack.pop()?.as_usize();
+                    let size = self.execution_machine.stack.pop()?.as_usize();
+                    let value = self.execution_machine.memory.read_bytes(offset, size);
+
+                    let mut sha3 = Sha3_256::new();
+                    sha3.update(&value);
+                    let digest = sha3.finalize();
+
+                    self.execution_machine
+                        .stack
+                        .push(U256::from_big_endian(digest.as_slice()))?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::ADDRESS => {
+                    let address = self.execution_env.contract_address;
+
+                    self.execution_machine
+                        .stack
+                        .push(U256::from(address.as_bytes()))?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::BALANCE => {
+                    let address = convert_u256_to_eth_address(self.execution_machine.stack.pop()?);
+
+                    if let Some(account) = self.global_env.global_storage.borrow().get(&address) {
+                        self.execution_machine.stack.push(account.balance)?;
+                    } else {
+                        self.execution_machine.stack.push(U256::zero())?;
+                    };
+
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::SELFBALANCE => {
+                    let address = self.execution_env.caller;
+
+                    if let Some(account) = self.global_env.global_storage.borrow().get(&address) {
+                        self.execution_machine.stack.push(account.balance)?;
+                    } else {
+                        self.execution_machine.stack.push(U256::zero())?;
+                    };
+
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::CALLER => {
+                    let caller = self.execution_env.caller;
+
+                    self.execution_machine
+                        .stack
+                        .push(U256::from(caller.as_bytes()))?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
                 OpCode::JUMP => {
                     let offset = self.execution_machine.stack.pop()?.as_usize();
 
@@ -232,7 +290,26 @@ impl ExecutionContext {
 
                     match OpCode::from(*opcode) {
                         OpCode::JUMPDEST => self.execution_machine.pc.set_exact(offset),
-                        _ => bail!("jump destination must be the JUMPDEST opcode"),
+                        _ => return Err(eyre::eyre!(OperationError::JumpDestExpected)),
+                    }
+                }
+
+                OpCode::JUMPI => {
+                    let counter = self.execution_machine.stack.pop()?.as_usize();
+                    let b = self.execution_machine.stack.pop()?;
+
+                    if !b.is_zero() {
+                        let Some(opcode) =  program.get(counter) else {
+                            bail!("index out of bounds for program offset")
+                        };
+
+                        // check jump destination must be the JUMPDEST opcode
+                        match OpCode::from(*opcode) {
+                            OpCode::JUMPDEST => self.execution_machine.pc.set_exact(counter),
+                            _ => return Err(eyre::eyre!(OperationError::JumpDestExpected)),
+                        }
+                    } else {
+                        self.execution_machine.pc.increment_by(1)
                     }
                 }
 
@@ -243,9 +320,13 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
-                OpCode::JUMPDEST => {
-                    // doesnt do anything
+                OpCode::MSIZE => {
+                    let size = self.execution_machine.memory.used_capacity();
+                    self.execution_machine.stack.push(U256::from(size))?;
+                    self.execution_machine.pc.increment_by(1);
                 }
+
+                OpCode::JUMPDEST => self.execution_machine.pc.increment_by(1),
 
                 OpCode::PUSH1 => {
                     let value = program
@@ -314,13 +395,11 @@ impl ExecutionContext {
                 OpCode::MSTORE => {
                     let offset = self.execution_machine.stack.pop()?;
                     let value = self.execution_machine.stack.pop()?;
-
-                    let mut value_be = vec![0u8; 32];
-                    value.to_big_endian(&mut value_be);
+                    let compresed = compressed_u256_bytes(value);
 
                     self.execution_machine
                         .memory
-                        .write_bytes(offset.as_usize(), value_be);
+                        .write_bytes(offset.as_usize(), compresed);
                     self.execution_machine.pc.increment_by(1);
                 }
 
@@ -363,7 +442,7 @@ impl ExecutionContext {
                     return Ok(return_value);
                 }
 
-                OpCode::NOOP => bail!(OperationError::Unsupported(*opcode)),
+                OpCode::INVALID => bail!(OperationError::InvalidOperation(*opcode)),
             }
         }
 

@@ -5,9 +5,11 @@ use thiserror::Error;
 #[derive(Debug, Error)]
 pub enum OperationError {
     #[error("unsupported operation {0}")]
-    Unsupported(u8),
+    InvalidOperation(u8),
     #[error("expect PUSH operation followed by a value : {0}")]
     PushValueExpected(OpCode),
+    #[error("JUMP destination must be a JUMPDEST instruction")]
+    JumpDestExpected,
 }
 
 #[derive(Debug)]
@@ -38,11 +40,25 @@ pub enum OpCode {
     BYTE,
     SHL,
     SHR,
-
+    // SHA3
+    SHA3,
+    // Environmental Information
+    ADDRESS,
+    BALANCE,
+    CALLER,
+    CALLVALUE,
+    // Block Information
+    SELFBALANCE,
+    // Stack Memory Storage and Flow Operations
     POP,
+    MLOAD,
+    MSTORE,
+    MSTORE8,
     JUMP,
-    PC,
+    JUMPI,
     JUMPDEST,
+    PC,
+    MSIZE,
     // Push Operations
     PUSH1,
     PUSH2,
@@ -51,15 +67,11 @@ pub enum OpCode {
     DUP1,
     // Exchange Operations
     SWAP1,
-    MLOAD,
-    MSTORE,
-    MSTORE8,
     // LOG0,
     LOG1,
-    CALLVALUE,
     RETURN,
 
-    NOOP,
+    INVALID,
 }
 
 impl From<u8> for OpCode {
@@ -91,13 +103,24 @@ impl From<u8> for OpCode {
             0x1B => Self::SHR,
             0x1C => Self::SHL,
 
+            0x20 => Self::SHA3,
+
+            0x30 => Self::ADDRESS,
+            0x31 => Self::BALANCE,
+            0x33 => Self::CALLER,
             0x34 => Self::CALLVALUE,
+
+            0x47 => Self::SELFBALANCE,
+
             0x50 => Self::POP,
             0x51 => Self::MLOAD,
             0x52 => Self::MSTORE,
             0x53 => Self::MSTORE8,
-            0x57 => Self::JUMP,
+            0x56 => Self::JUMP,
+            0x57 => Self::JUMPI,
             0x58 => Self::PC,
+            0x59 => Self::MSIZE,
+
             0x5B => Self::JUMPDEST,
             0x60 => Self::PUSH1,
             0x61 => Self::PUSH2,
@@ -108,7 +131,7 @@ impl From<u8> for OpCode {
             0xA1 => Self::LOG1,
             0xF3 => Self::RETURN,
 
-            _ => Self::NOOP,
+            0xFE | _ => Self::INVALID,
         }
     }
 }
@@ -146,23 +169,34 @@ impl fmt::Display for OpCode {
                 Self::SHL => "SHL",
                 Self::SHR => "SHR",
 
+                Self::SHA3 => "SHA3",
+
+                Self::ADDRESS => "ADDRESS",
+                Self::BALANCE => "BALANCE",
+                Self::CALLER => "CALLER",
+
+                Self::SELFBALANCE => "SELFBALANCE",
+
+                Self::MLOAD => "MLOAD",
+                Self::MSTORE => "MSTORE",
+                Self::MSTORE8 => "MSTORE8",
                 Self::JUMP => "JUMP",
+                Self::JUMPI => "JUMPI",
                 Self::PC => "PC",
+                Self::MSIZE => "MSIZE",
                 Self::JUMPDEST => "JUMPDEST",
+
                 Self::PUSH1 => "PUSH1",
                 Self::PUSH2 => "PUSH2",
                 Self::PUSH3 => "PUSH3",
                 Self::DUP1 => "DUP1",
                 Self::SWAP1 => "SWAP1",
-                Self::MLOAD => "MLOAD",
-                Self::MSTORE => "MSTORE",
-                Self::MSTORE8 => "MSTORE8",
                 // Self::LOG0 => "LOG0",
                 Self::LOG1 => "LOG1",
                 Self::CALLVALUE => "CALLVALUE",
                 Self::RETURN => "RETURN",
 
-                Self::NOOP => "NOOP",
+                Self::INVALID => "INVALID",
             }
         )
     }
