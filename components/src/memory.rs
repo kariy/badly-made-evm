@@ -9,15 +9,17 @@ impl Memory {
     /// if it goes beyond its current size, writes 0s
     ///
     /// `total` the number of bytes to be read starting from `offset`
-    pub fn read_bytes(&self, offset: usize, total: usize) -> Vec<u8> {
+    ///
+    /// it needs to be mutable because reading to a bigger offset will trigger a memory expansion https://www.evm.codes/about#memoryexpansion
+    pub fn read_bytes(&mut self, offset: usize, total: usize) -> Vec<u8> {
         let size = self.0.len();
         let to = offset + total;
 
         if to > size {
-            [self.0[offset..size].to_vec(), vec![0u8; to - size]].concat()
-        } else {
-            self.0[offset..to].to_vec()
+            self.0.resize_with(to, || 0);
         }
+
+        self.0[offset..to].to_vec()
     }
 
     /// if the size of `value` + `offset` is bigger than the current memory size,
@@ -58,14 +60,14 @@ mod tests {
 
     #[test]
     fn read_slice_when_size_is_less_than_slice() {
-        let memory = Memory(vec![6, 9, 1, 9, 7, 2, 4]);
+        let mut memory = Memory(vec![6, 9, 1, 9, 7, 2, 4]);
         let value = memory.read_bytes(5, 5);
         assert_eq!(value, vec![2, 4, 0, 0, 0])
     }
 
     #[test]
     fn read_word() {
-        let memory = Memory(vec![6; 128]);
+        let mut memory = Memory(vec![6; 128]);
         assert_eq!(memory.read_bytes(0, 32).len(), 32);
     }
 }
