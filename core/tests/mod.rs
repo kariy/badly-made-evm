@@ -107,13 +107,7 @@ mod tests {
 
         assert!(context.run(program).is_ok());
 
-        let expected_value = U256::from_str_radix(
-            "0023440000000000000000000000000000000000000000000000000000000000",
-            16,
-        )
-        .unwrap();
-
-        let value = context.execution_machine.memory.read_bytes(0, 3);
+        let value = context.execution_machine.memory.read_bytes(0, 32);
 
         assert!(context.execution_machine.stack.height() == 2);
         assert!(
@@ -123,12 +117,12 @@ mod tests {
 
         assert_eq!(U256::from_big_endian(&value), U256::from(0x002344));
         assert_eq!(
-            expected_value,
-            context.execution_machine.stack.get_from_top(0).unwrap()
+            context.execution_machine.stack.get_from_top(0).unwrap(),
+            U256::from(0x002344)
         );
         assert_eq!(
-            expected_value,
-            context.execution_machine.stack.get_from_top(1).unwrap()
+            context.execution_machine.stack.get_from_top(1).unwrap(),
+            U256::from(0x002344)
         );
     }
 
@@ -160,8 +154,8 @@ mod tests {
     #[test]
     fn test_sha3_precompiled() {
         let program = vec![
-            0x62, 0x69, 0x12, 0x99, 0x60, 0x00, 0x52, 0x60, 0x03, 0x60, 0x00, 0x20, 0x61, 0x69,
-            0x12, 0x60, 0x00, 0x52, 0x60, 0x02, 0x60, 0x00, 0x20,
+            0x62, 0x99, 0x88, 0x77, 0x60, 0x00, 0x52, 0x60, 32, 0x60, 0x00, 0x20, 0x61, 0x88, 0x77,
+            0x60, 0x00, 0x52, 0x60, 32, 0x60, 0x00, 0x20,
         ];
         let mut context = ExecutionContext::default();
 
@@ -169,7 +163,7 @@ mod tests {
         assert_eq!(
             context.execution_machine.stack.pop().unwrap(),
             U256::from_str_radix(
-                "792a606aa2618dfd7783da32b4584fbf99033bf61c3b91c766aa08fd7dd2a4b4",
+                "17f4d2d1c0eeabac92fa5cea16f773d1dd884baa101e0ea7b89f8ef32c9c9f20",
                 16
             )
             .unwrap()
@@ -177,10 +171,23 @@ mod tests {
         assert_eq!(
             context.execution_machine.stack.pop().unwrap(),
             U256::from_str_radix(
-                "a63d3141e51e0d7dd85f429012c8b62d573940ff51a7378f3739522a038a0d99",
+                "bafcb21c8036fea04eec31342b90d24355d75c520b7139d508e9a98641e1b0a8",
                 16
             )
             .unwrap()
-        )
+        );
+    }
+
+    #[test]
+    fn environmental_info() {
+        let program = vec![
+            0x60, 0x00, 0x60, 0x23, 0x60, 0x04, 0x60, 0x00, 0x60, 0x00, 0x39,
+        ];
+        let mut context = ExecutionContext::default();
+
+        assert!(context.run(program).is_ok(), "run failed");
+
+        let code_in_memory = context.execution_machine.memory.read_bytes(0, 4);
+        assert_eq!(code_in_memory, vec![0x60, 0x00, 0x60, 0x23]);
     }
 }

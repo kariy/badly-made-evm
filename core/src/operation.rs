@@ -47,6 +47,8 @@ pub enum OpCode {
     BALANCE,
     CALLER,
     CALLVALUE,
+    CODESIZE,
+    CODECOPY,
     // Block Information
     SELFBALANCE,
     // Stack Memory Storage and Flow Operations
@@ -109,6 +111,8 @@ impl From<u8> for OpCode {
             0x31 => Self::BALANCE,
             0x33 => Self::CALLER,
             0x34 => Self::CALLVALUE,
+            0x38 => Self::CODESIZE,
+            0x39 => Self::CODECOPY,
 
             0x47 => Self::SELFBALANCE,
 
@@ -174,6 +178,8 @@ impl fmt::Display for OpCode {
                 Self::ADDRESS => "ADDRESS",
                 Self::BALANCE => "BALANCE",
                 Self::CALLER => "CALLER",
+                Self::CODESIZE => "CODESIZE",
+                Self::CODECOPY => "CODECOPY",
 
                 Self::SELFBALANCE => "SELFBALANCE",
 

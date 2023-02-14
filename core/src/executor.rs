@@ -1,6 +1,6 @@
 use crate::environment::GlobalEnvironment;
 use crate::operation::{OpCode, OperationError};
-use crate::utils::{compressed_u256_bytes, convert_u256_to_eth_address};
+use crate::utils::convert_u256_to_eth_address;
 
 use std::{cell::RefCell, rc::Rc};
 
@@ -280,6 +280,24 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
+                OpCode::CODESIZE => {
+                    let code_size = program.len();
+                    self.execution_machine.stack.push(U256::from(code_size))?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::CODECOPY => {
+                    let dest_offset = self.execution_machine.stack.pop()?.as_usize();
+                    let offset = self.execution_machine.stack.pop()?.as_usize();
+                    let size = self.execution_machine.stack.pop()?.as_usize();
+                    let code = &program[offset..(offset + size)];
+
+                    self.execution_machine
+                        .memory
+                        .write_bytes(dest_offset, code.to_vec());
+                    self.execution_machine.pc.increment_by(1);
+                }
+
                 OpCode::JUMP => {
                     let offset = self.execution_machine.stack.pop()?.as_usize();
 
@@ -395,11 +413,13 @@ impl ExecutionContext {
                 OpCode::MSTORE => {
                     let offset = self.execution_machine.stack.pop()?;
                     let value = self.execution_machine.stack.pop()?;
-                    let compresed = compressed_u256_bytes(value);
+
+                    let mut value_be = [0u8; 32];
+                    value.to_big_endian(&mut value_be);
 
                     self.execution_machine
                         .memory
-                        .write_bytes(offset.as_usize(), compresed);
+                        .write_bytes(offset.as_usize(), value_be.to_vec());
                     self.execution_machine.pc.increment_by(1);
                 }
 

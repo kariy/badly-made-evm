@@ -44,9 +44,9 @@ No. of OPCODEs implemented : **38/141**
 
 | Mnemonic | OpCode | Status |
 | -------- | ------ | ------ |
-| SHA3     | 0x20   |        |
+| SHA3     | 0x20   | Done   |
 
-### 0x30 range - Environmental **Information**
+### 0x30 range - Environmental Information
 
 | Mnemonic       | OpCode | Status |
 | -------------- | ------ | ------ |
@@ -58,8 +58,8 @@ No. of OPCODEs implemented : **38/141**
 | CALLDATALOAD   | 0x35   |        |
 | CALLDATASIZE   | 0x36   |        |
 | CALLDATACOPY   | 0x37   |        |
-| CODESIZE       | 0x38   |        |
-| CODECOPY       | 0x39   |        |
+| CODESIZE       | 0x38   | Done   |
+| CODECOPY       | 0x39   | Done   |
 | GASPRICE       | 0x3A   |        |
 | EXTCODESIZE    | 0x3B   |        |
 | EXTCODECOPY    | 0x3C   |        |

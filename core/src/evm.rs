@@ -58,14 +58,20 @@ mod tests {
     #[test]
     fn not_so_simple_boring_run() {
         let program = vec![
-            0x60, 0x69, 0x80, 0x14, 0x15, 0x61, 0x20, 0x77, 0x60, 0x00, 0x52, 0x60, 0x02, 0x60,
-            0x00, 0xF3,
+            0x60, 0x69, 0x80, 0x14, 0x15, 0x61, 0x20, 0x77, 0x60, 0x00, 0x52, 0x60, 32, 0x60, 0x00,
+            0xF3,
         ];
         let mut evm = Evm::new_with_config(EvmConfig {
             ..Default::default()
         });
 
         let result = evm.boring_run(program).unwrap();
-        assert_eq!(result, vec![0x20, 0x77]);
+
+        let mut expected_value = vec![0u8; 32];
+        expected_value[30] = 32;
+        expected_value[31] = 119;
+
+        assert_eq!(result.len(), 32);
+        assert_eq!(result, expected_value);
     }
 }
