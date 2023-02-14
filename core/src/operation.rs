@@ -135,7 +135,8 @@ impl From<u8> for OpCode {
             0xA1 => Self::LOG1,
             0xF3 => Self::RETURN,
 
-            0xFE | _ => Self::INVALID,
+            0xFE => Self::INVALID,
+            _ => Self::INVALID,
         }
     }
 }

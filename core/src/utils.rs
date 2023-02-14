@@ -18,7 +18,7 @@ pub fn compressed_u256_bytes(value: U256) -> Vec<u8> {
         }
     }
 
-    return compressed;
+    compressed
 }
 
 #[cfg(test)]
