@@ -1,3 +1,4 @@
+use color_eyre::owo_colors::OwoColorize;
 use ethereum_types::U256;
 use thiserror::Error;
 
@@ -71,6 +72,28 @@ impl Stack {
 
     pub fn is_empty(&self) -> bool {
         self.inner.is_empty()
+    }
+}
+
+impl std::fmt::Display for Stack {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let mut items = String::new();
+
+        for i in 1..=self.inner.len() {
+            items.push_str(&format!(
+                "[{}]: {:#04x}\n",
+                i - 1,
+                self.inner[self.inner.len() - i]
+            ));
+        }
+
+        write!(
+            f,
+            r"{}
+{}",
+            "[ Stack ]".purple().bold(),
+            items
+        )
     }
 }
 

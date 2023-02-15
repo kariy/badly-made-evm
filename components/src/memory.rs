@@ -1,3 +1,5 @@
+use color_eyre::owo_colors::OwoColorize;
+
 #[derive(Debug, Default)]
 pub struct Memory(Vec<u8>);
 
@@ -27,7 +29,7 @@ impl Memory {
     pub fn write_bytes(&mut self, offset: usize, value: Vec<u8>) {
         let to = offset + value.len();
         if to > self.0.len() {
-            self.0.resize_with(to, || 0)
+            self.0.resize_with(to, || 0);
         }
         self.0.splice(offset..to, value);
     }
@@ -35,6 +37,23 @@ impl Memory {
     /// Returns the amount of memory used in bytes
     pub fn used_capacity(&self) -> usize {
         self.0.len()
+    }
+}
+
+impl std::fmt::Display for Memory {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            r"{}
+0x{}
+",
+            "[ Memory ]".purple(),
+            self.0
+                .iter()
+                .map(|i| format!("{i:02x}"))
+                .collect::<Vec<_>>()
+                .join("")
+        )
     }
 }
 

@@ -2,13 +2,12 @@ use std::{cell::RefCell, rc::Rc};
 
 use crate::environment::{CurrentBlockInformation, GlobalEnvironment, GlobalStorage};
 use crate::executor::{ExecutionContext, ExecutionEnvironment};
-use color_eyre::Result;
 
 #[derive(Debug, Default, Clone)]
 pub struct EvmConfig {
-    chain_id: u32,
-    current_block: CurrentBlockInformation,
-    root_execution_env: ExecutionEnvironment,
+    pub chain_id: u32,
+    pub current_block: CurrentBlockInformation,
+    pub root_execution_env: ExecutionEnvironment,
 }
 
 #[derive(Default)]
@@ -17,6 +16,7 @@ pub struct Evm {
     global_env: Rc<GlobalEnvironment>,
 }
 
+// TODO: its ugly and doesnt make sense pls fix
 impl Evm {
     pub fn new_with_config(config: EvmConfig) -> Self {
         Self {
@@ -29,14 +29,11 @@ impl Evm {
         }
     }
 
-    /// Will execute based on the provided program
-    pub fn boring_run(&mut self, program: Vec<u8>) -> Result<Vec<u8>> {
-        let mut executor = ExecutionContext::new(
+    pub fn build_executor(&mut self) -> ExecutionContext {
+        ExecutionContext::new(
             self.config.root_execution_env.clone(),
             self.global_env.clone(),
-        );
-        let result = executor.run(program)?;
-        Ok(result)
+        )
     }
 }
 
@@ -51,8 +48,10 @@ mod tests {
             ..Default::default()
         });
 
-        let result = evm.boring_run(program).unwrap();
-        assert_eq!(result, vec![]);
+        let mut exec = evm.build_executor();
+        let result = exec.run(program).unwrap();
+
+        assert_eq!(result.data, vec![]);
     }
 
     #[test]
@@ -65,13 +64,14 @@ mod tests {
             ..Default::default()
         });
 
-        let result = evm.boring_run(program).unwrap();
+        let mut exec = evm.build_executor();
+        let result = exec.run(program).unwrap();
 
         let mut expected_value = vec![0u8; 32];
         expected_value[30] = 32;
         expected_value[31] = 119;
 
-        assert_eq!(result.len(), 32);
-        assert_eq!(result, expected_value);
+        assert_eq!(result.data.len(), 32);
+        assert_eq!(result.data, expected_value);
     }
 }

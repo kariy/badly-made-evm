@@ -1,4 +1,4 @@
-use crate::environment::GlobalEnvironment;
+use crate::environment::{ExecutionResult, GlobalEnvironment};
 use crate::operation::{OpCode, OperationError};
 use crate::utils::convert_u256_to_eth_address;
 use crate::{construct_dup_op, construct_push_op, construct_swap_op};
@@ -10,6 +10,7 @@ use ethereum_types::{H160, U256};
 use evm_components::ExecutionMachine;
 use sha3::{Digest, Sha3_256};
 
+// this should be something that user can set through the cli
 #[derive(Debug, Default, Clone)]
 pub struct ExecutionEnvironment {
     pub value: U256,
@@ -38,14 +39,14 @@ impl ExecutionContext {
         }
     }
 
-    pub fn run(&mut self, program: Vec<u8>) -> Result<Vec<u8>> {
-        let mut return_value = Vec::new();
+    pub fn run(&mut self, program: Vec<u8>) -> Result<ExecutionResult> {
+        let mut result = Vec::new();
 
         while let Some(opcode) = program.get(self.execution_machine.pc.get()) {
             let operation = OpCode::from(*opcode);
 
             match operation {
-                OpCode::STOP => return Ok(return_value),
+                OpCode::STOP => return Ok(ExecutionResult { data: result }),
 
                 OpCode::ADD => {
                     let a = self.execution_machine.stack.pop()?;
@@ -412,17 +413,19 @@ impl ExecutionContext {
                     let size = self.execution_machine.stack.pop()?.as_usize();
                     let value = self.execution_machine.memory.read_bytes(offset, size);
 
+                    println!("{value:x?} {}", value.len());
+
                     for i in value.into_iter() {
-                        return_value.push(i);
+                        result.push(i);
                     }
 
-                    return Ok(return_value);
+                    return Ok(ExecutionResult { data: result });
                 }
 
                 OpCode::INVALID => bail!(OperationError::InvalidOperation(*opcode)),
             }
         }
 
-        Ok(return_value)
+        Ok(ExecutionResult { data: result })
     }
 }

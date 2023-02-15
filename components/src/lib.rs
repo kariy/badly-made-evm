@@ -24,3 +24,17 @@ impl default::Default for ExecutionMachine {
         }
     }
 }
+
+impl std::fmt::Display for ExecutionMachine {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            r"{}
+            
+{}
+{}
+",
+            self.pc, self.stack, self.memory
+        )
+    }
+}
