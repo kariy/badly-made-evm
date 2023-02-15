@@ -1,5 +1,5 @@
 [workspace]
-members = ["core", "components"]
+members = ["core", "components", "cli"]
 
 [workspace.package]
 name = "badly_made_evm"
@@ -9,6 +9,7 @@ authors = ["Kariy <evergreenkary@gmail.com>"]
 repository = "https://github.com/kariy/badly-made-evm"
 
 [workspace.dependencies]
+hex = "0.4.3"
 sha3 = "0.10.6"
 color-eyre = "0.6.2"
 thiserror = "1.0.38"

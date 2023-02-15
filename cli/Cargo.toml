@@ -1,0 +1,19 @@
+[package]
+name = "cli"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+[[bin]]
+name = "badevm"
+path = "./src/main.rs"
+
+[dependencies]
+dotenv = "0.15.0"
+hex.workspace = true
+color-eyre.workspace = true
+evm-core = { path = "../core" }
+ethereum-types.workspace = true
+evm-components = { path = "../components" }
+clap = { version = "4.1.4", features = ["derive", "env"] }
+
