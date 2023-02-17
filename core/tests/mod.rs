@@ -102,6 +102,26 @@ mod tests {
     }
 
     #[test]
+    fn log_operations() {
+        let program = vec![
+            0x60, 0x69, 0x80, 0x60, 0x42, 0x60, 0x00, 0x80, 0xA3, 0x60, 0x77, 0x60, 0x00, 0x80,
+            0xA1,
+        ];
+        let mut context = ExecutionContext::default();
+
+        context.run(program).unwrap();
+
+        let logs = context.logs.borrow().to_owned();
+        assert_eq!(logs.len(), 2);
+        assert_eq!(logs[0].len(), 3);
+        assert_eq!(logs[1].len(), 1);
+        assert_eq!(logs[0][0], U256::from(0x42));
+        assert_eq!(logs[0][1], U256::from(0x69));
+        assert_eq!(logs[0][2], U256::from(0x69));
+        assert_eq!(logs[1][0], U256::from(0x77));
+    }
+
+    #[test]
     fn memory_operations() {
         let program = vec![
             0x62, 0x00, 0x23, 0x44, 0x60, 0x00, 0x52, 0x60, 0x00, 0x51, 0x60, 0x00, 0x51,

@@ -1,7 +1,7 @@
 use crate::environment::{ExecutionResult, GlobalEnvironment};
 use crate::operation::{OpCode, OperationError};
 use crate::utils::convert_u256_to_eth_address;
-use crate::{construct_dup_op, construct_push_op, construct_swap_op};
+use crate::{construct_dup_op, construct_log_op, construct_push_op, construct_swap_op};
 
 use std::{cell::RefCell, rc::Rc};
 
@@ -300,6 +300,30 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
+                OpCode::CALLDATALOAD => {
+                    let len = self.execution_env.calldata.len();
+                    let offset = self.execution_machine.stack.pop()?.as_usize();
+
+                    let data = if offset + 32 > len {
+                        let mut data = self.execution_env.calldata[offset..].to_vec();
+                        data.resize(32, 0);
+                        data
+                    } else {
+                        self.execution_env.calldata[offset..(offset + 32)].to_vec()
+                    };
+
+                    self.execution_machine
+                        .stack
+                        .push(U256::from_big_endian(&data))?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
+                OpCode::CALLDATASIZE => {
+                    let size = self.execution_env.calldata.len();
+                    self.execution_machine.stack.push(U256::from(size))?;
+                    self.execution_machine.pc.increment_by(1);
+                }
+
                 OpCode::JUMP => {
                     let offset = self.execution_machine.stack.pop()?.as_usize();
 
@@ -391,15 +415,16 @@ impl ExecutionContext {
                     self.execution_machine.pc.increment_by(1);
                 }
 
-                OpCode::LOG1 => {
-                    let _ = self.execution_machine.stack.pop()?.as_usize();
-                    let _ = self.execution_machine.stack.pop()?;
-                    let topic1 = self.execution_machine.stack.pop()?;
+                OpCode::LOG(amount) => {
+                    // let _ = self.execution_machine.stack.pop()?.as_usize();
+                    // let _ = self.execution_machine.stack.pop()?;
+                    // let topic1 = self.execution_machine.stack.pop()?;
 
-                    let log = vec![topic1];
+                    // let log = vec![topic1];
 
-                    self.logs.borrow_mut().push(log);
-                    self.execution_machine.pc.increment_by(1);
+                    // self.logs.borrow_mut().push(log);
+                    // self.execution_machine.pc.increment_by(1);
+                    construct_log_op!(amount, self)
                 }
 
                 OpCode::CALLVALUE => {

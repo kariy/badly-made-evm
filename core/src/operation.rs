@@ -49,6 +49,8 @@ pub enum OpCode {
     CALLVALUE,
     CODESIZE,
     CODECOPY,
+    CALLDATALOAD,
+    CALLDATASIZE,
     // Block Information
     SELFBALANCE,
     // Stack Memory Storage and Flow Operations
@@ -68,7 +70,7 @@ pub enum OpCode {
     // Exchange Operations
     SWAP(usize),
     // LOG0,
-    LOG1,
+    LOG(usize),
     RETURN,
 
     INVALID,
@@ -111,6 +113,8 @@ impl From<u8> for OpCode {
             0x34 => Self::CALLVALUE,
             0x38 => Self::CODESIZE,
             0x39 => Self::CODECOPY,
+            0x35 => Self::CALLDATALOAD,
+            0x36 => Self::CALLDATASIZE,
 
             0x47 => Self::SELFBALANCE,
 
@@ -131,7 +135,8 @@ impl From<u8> for OpCode {
 
             0x90..=0x9F => Self::SWAP((value - 0x8F) as usize),
             // 0xA0 => Self::LOG0,
-            0xA1 => Self::LOG1,
+            0xA0..=0xA4 => Self::LOG((value - 0xA0) as usize),
+
             0xF3 => Self::RETURN,
 
             0xFE => Self::INVALID,
@@ -180,6 +185,8 @@ impl fmt::Display for OpCode {
                 Self::CALLER => "CALLER",
                 Self::CODESIZE => "CODESIZE",
                 Self::CODECOPY => "CODECOPY",
+                Self::CALLDATALOAD => "CALLDATALOAD",
+                Self::CALLDATASIZE => "CALLDATASIZE",
 
                 Self::SELFBALANCE => "SELFBALANCE",
 
@@ -197,8 +204,9 @@ impl fmt::Display for OpCode {
                 Self::DUP(amount) => Box::leak(Box::new(format!("DUP{}", amount))),
 
                 Self::SWAP(amount) => Box::leak(Box::new(format!("SWAP{}", amount))),
-                // Self::LOG0 => "LOG0",
-                Self::LOG1 => "LOG1",
+
+                Self::LOG(amount) => Box::leak(Box::new(format!("LOG{}", amount))),
+
                 Self::CALLVALUE => "CALLVALUE",
                 Self::RETURN => "RETURN",
 
@@ -240,6 +248,24 @@ macro_rules! construct_swap_op {
         let b = $self.execution_machine.stack.get_from_top($a)?;
         $self.execution_machine.stack.set_from_top(0, b)?;
         $self.execution_machine.stack.set_from_top(1, a)?;
+        $self.execution_machine.pc.increment_by(1);
+    }};
+}
+
+#[macro_export]
+macro_rules! construct_log_op {
+    ($a:expr, $self:expr) => {{
+        let _ = $self.execution_machine.stack.pop()?;
+        let _ = $self.execution_machine.stack.pop()?;
+
+        let mut log: Vec<U256> = Vec::new();
+
+        for _ in 0..$a {
+            let topic = $self.execution_machine.stack.pop()?;
+            log.push(topic);
+        }
+
+        $self.logs.borrow_mut().push(log);
         $self.execution_machine.pc.increment_by(1);
     }};
 }

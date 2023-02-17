@@ -2,7 +2,7 @@
 
 > _Yes, the tables are stolen from [vEVM's README](https://github.com/kethcode/vEVM/blob/main/README.md) because I'm a lazy ass._
 
-No. of OPCODEs implemented : **108/141**
+No. of OPCODEs implemented : **114/141**
 
 ### 0x00 range - Stop and Arithmetic Operations
 
@@ -55,8 +55,8 @@ No. of OPCODEs implemented : **108/141**
 | ORIGIN         | 0x32   |        |
 | CALLER         | 0x33   | Done   |
 | CALLVALUE      | 0x34   | Done   |
-| CALLDATALOAD   | 0x35   |        |
-| CALLDATASIZE   | 0x36   |        |
+| CALLDATALOAD   | 0x35   | Done   |
+| CALLDATASIZE   | 0x36   | Done   |
 | CALLDATACOPY   | 0x37   |        |
 | CODESIZE       | 0x38   | Done   |
 | CODECOPY       | 0x39   | Done   |
@@ -181,11 +181,11 @@ No. of OPCODEs implemented : **108/141**
 
 | Mnemonic | OpCode | Status |
 | -------- | ------ | ------ |
-| LOG0     | 0xA0   |        |
+| LOG0     | 0xA0   | Done   |
 | LOG1     | 0xA1   | Done   |
-| LOG2     | 0xA2   |        |
-| LOG3     | 0xA3   |        |
-| LOG4     | 0xA4   |        |
+| LOG2     | 0xA2   | Done   |
+| LOG3     | 0xA3   | Done   |
+| LOG4     | 0xA4   | Done   |
 
 ### 0xb0 range
 
